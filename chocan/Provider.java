@@ -1,5 +1,5 @@
 package chocan;
-import javafx.scene.chart.PieChart;
+//import javafx.scene.chart.PieChart; // What is this? -Jaime
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -45,7 +45,7 @@ public class Provider  extends Data
 
         if(debug == true)
         {
-            System.out.println("Data constructor");
+            System.out.println("Provider constructor");
             System.out.println("fName = " + fName);
             System.out.println("lName = " + lName);
             System.out.println("num = " + num);
@@ -187,6 +187,21 @@ public class Provider  extends Data
         return aMatch;
     }
 
+    public String toString()
+    {
+        boolean debug = !true;
+
+        if(debug == true)
+        {
+            System.out.println("Provider toString");
+        }
+
+//        String data = null;
+
+        String data = super.toString();
+
+        return data;
+    }
 
     // Displays the provider's information and all the services the provider provided
     public void displayAll()

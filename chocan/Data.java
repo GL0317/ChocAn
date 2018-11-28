@@ -4,74 +4,129 @@ import java.util.*;
 //public class Data
 public abstract class Data
 {
-    boolean debug = true;
+    protected ArrayList<Service> services;
 
-/*    protected Set<Data> services;
-    public String firstName;
-    public String lastName;
-    public int number;
-*/    protected String firstName;
+
+    protected String firstName;
     protected String lastName;
-    protected int number;
     protected String address;
     protected String city;
     protected String state;
     protected int zip;
-//    protected int id;
+    protected int id;
+
+
 
     public Data()
     {
-        if(debug == true)
-        {
-            System.out.println("Data default constructor");
-        }
-
-//        services = null;
+        services = null;
         firstName = null;
         lastName = null;
-        number = 0;
         address = null;
         city = null;
         state = null;
         zip = 0;
-//        id = 0;
+        id = 0;
     }
 
-    public Data(String fName, String lName, int num, String address, String city, String state, int zip/*, int id*/)
-    {
-        if(debug == true)
-        {
-            System.out.println("Data constructor");
-            System.out.println("fName = " + fName);
-            System.out.println("lName = " + lName);
-            System.out.println("num = " + num);
-            System.out.println("address = " + address);
-            System.out.println("city = " + city);
-            System.out.println("state = " + state);
-            System.out.println("zip = " + zip);
-        }
 
-//        services = null;
+
+    public Data(String fName, String lName, String address, String city, String state, int zip, int id)
+    {
+        services = null;
         this.firstName = fName;
         this.lastName = lName;
-        this.number = num;
         this.address = address;
         this.city = city;
         this.state = state;
         this.zip = zip;
-//        this.id = id;
+        this.id = id;
     }
 
+
+
+    // Outputs attributes to a screen or a file, depending on output stream
     public String toString()
     {
+        boolean debug = !true;
+        String person;
+        String location;
+
         if(debug == true)
         {
             System.out.println("Data toString");
         }
+        person = "First Name: " + this.firstName + "\nLast Name: " + this.lastName + "\nID Number: " + this.id;
+        location = "Address: " + this.address + "\nCity: " + this.city + "\nState: " + this.state + "\nZip: " + this.zip;
+        return person + "\n" + location;
 
-        String data = null;
-        data = "First Name: " + this.firstName + "\nLast Name: " + this.lastName + "\nNumber: " + number + "\nAddress: " + this.address + "\nCity: " + this.city + "\nState: " + this.state + "\nZip: " + this.zip;
-
-        return data;
     }
+
+
+
+    /** Edits provider or member's information
+     *
+     * @param info - all string type data: first name, last name, address, city, and state
+     * @param number - all integer type data:  id and zip code
+     * @param choice - selects the data to edit
+     * @return
+     */
+    public boolean edit (String info, int number, int choice)
+    {
+        boolean flag = true;
+        if (info != null)
+        {
+            switch (choice)
+            {
+                case 1:
+                    lastName = new String(info);
+                    break;
+                case 2:
+                    firstName = new String(info);
+                    break;
+                case 4:
+                    address = new String(info);
+                    break;
+                case 5:
+                    city = new String(info);
+                    break;
+                case 6:
+                    state = new String(info);
+                    break;
+                default:
+                    flag = false;
+                    break;
+            }
+        }
+        if (number > 0) {
+
+            switch (choice) {
+                case 3:
+                    id = number;
+                    break;
+                case 7:
+                    zip = number;
+                    break;
+                default:
+                    flag = false;
+                    break;
+            }
+        }
+       return flag;
+    }
+
+
+
+    //  Allow subclasses to write and append their data to a file
+    public abstract String[] report();
+
+
+
+    // Allow subclasses to add services to their own list of services
+    public abstract boolean addService(Service aService, String name, int id);
+
+
+
+    // Allow subclasses to output their data, and all of their services
+    public abstract void displayAll();
 }

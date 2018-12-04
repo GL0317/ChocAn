@@ -1,26 +1,30 @@
 package chocan;
-//import javafx.scene.chart.PieChart; // What is this? -Jaime
 
+import java.util.*;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.FileOutputStream;
-import java.util.*;
 
-public class Provider  extends Data
+public class Provider extends Data
 {
-    protected int consult; // number of consultations with members
+    private int consult; // number of consultations with members
+    private boolean privilege;  // the value is true if provider has manager privileges
+    private ArrayList <String> memberNames; // stores the name of member for each service provided
+    private ArrayList<Integer> memberId;
+    private PrintWriter toFile;
+    private int totalFees;
+
+
+
     public Provider()
     {
-//        boolean debug = true;
-
         super();
         consult = 0;
-
-    /*    if(debug == true)
-        {
-            System.out.println("Provider default constructor ");
-        }*/
-
+        memberNames = null;
+        memberId = null;
+        privilege = false;
+        toFile = null;
+        totalFees = 0;
     }
 
 
@@ -34,38 +38,59 @@ public class Provider  extends Data
      * @param state
      * @param zip
      * @param id: provider's identification number
-     * @param num: the number of consultations the provider provided to a member
      */
-    public Provider(String fName, String lName, String address, String city, String state, int zip, int id, int num)
+    public Provider(String fName, String lName, String address, String city, String state, int zip, int id, boolean isManager)
     {
         super(fName, lName, address, city, state, zip, id);
-        consult = num;
-
-    /*    boolean debug = false;
-
-        if(debug == true)
+        this.consult = 0;
+        this.memberNames = null;
+        this.memberId = null;
+        this.totalFees = 0;
+        try
         {
-            System.out.println("Provider constructor");
-            System.out.println("fName = " + fName);
-            System.out.println("lName = " + lName);
-            System.out.println("num = " + num);
-            System.out.println("address = " + address);
-            System.out.println("city = " + city);
-            System.out.println("state = " + state);
-            System.out.println("zip = " + zip);
+            this.privilege = isManager;
         }
-
-//        services = null;
-        this.firstName = fName;
-        this.lastName = lName;
-//        this.number = num;
-        this.address = address;
-        this.city = city;
-        this.state = state;
-        this.zip = zip;
-//        this.id = id;
-*/
+        catch (InputMismatchException e)
+        {
+            System.out.println("This provider will not have manager privileges.");
+            this.privilege = false;
+        }
     }
+
+
+
+    /** Inserts one service to a list of services. Appends new services to an existing list of services
+     *
+     * @precondition:
+     *              Case 1: The list is empty, and the service is the first item on the list
+     *              Case 2: There are services in the list, and inserting a new service
+     * @postcondition:  If the list is empty, then a new list is created and the new service becomes the first item on
+     *                  the list.  If the list is not empty, the new service is added at the end of a list
+     * @param name: holds the name of a member
+     * @param id: holds the member's ID number
+     * @param toAdd: An object containing service information
+     * @return true:  Inserting new service is successful
+     * @return false: Inserting new service failed, toAdd may be null
+     */
+    public boolean addService(Service toAdd, String name, int id)
+    {
+        if (toAdd != null) {
+            // if services is null, create a new list of services
+            if (isEmpty()) {
+                services = new ArrayList<>();
+                memberNames = new ArrayList<>();
+                memberId = new ArrayList<>();
+            }
+            services.add(toAdd);  // insert toAdd to list
+            memberNames.add(name);
+            memberId.add(id);
+            ++ consult; // increment consultation with a member
+            totalFees += toAdd.fee;
+            return true;
+        }
+        return false;
+    }
+
 
 
     /** Writes provider's information, all the services the provider provided, the total number of consultations,
@@ -77,11 +102,10 @@ public class Provider  extends Data
      * @precondition:  If a file does not exist, this method creates a new file and writes to the file regardless of
      *                 the value of append.
      * @postcondition:  A new file exist or a new member's info is appended to an existing file
+     * @return true: writing to file is successful, otherwise returns false
      */
     public boolean buildReport(String fileName, boolean append)
     {
-        // I MAY NEED TO ADD A DATA OBJECT PARAMETER TO THIS METHOD, SO I CAN ACCESS MEMBER'S PUBLIC METHODS
-        // EX: public boolean buildReport(String fileName, boolean append, Data person)
         boolean isOpen = true;
 
         // open file
@@ -95,123 +119,138 @@ public class Provider  extends Data
         }
         if (isOpen)
         {
-            // write provider to file
-            toFile.println(this);  // it will call the string method from the Data class
-            // write all services to file
-            for(Service s: services)
-            {
-                // NEED TO WRITE MEMBER'S FULL NAME (FIRST AND LAST): ex:  member.getFName() member.getLName
-                // NEED TO WRITE MEMBER'S ID NUMBER ex: member.getID()
-                toFile.println(s);
-                // NEED TO CALCULATE THE TOTAL FEES OF ALL SERVICES IN THE LIST
-                // NEED TO WRITE TOTAL SERVICE FEES FOR THE WEEK
-            }
-            toFile.println("Total Number of consultation with members: " + consult);
+            toFile.println(finalReport());  // write the provider report to file
             // close file
             toFile.close();
         }
         return isOpen;
-
     }
 
 
 
-    /** Inserts one service to a list of services. Does not allow duplicates, and appends new services to an existing
-     * list of services
-     * @precondition:
-     *              Case 1: The list is empty, and the service is the first item on the list
-     *              Case 2: There are services in the list, and inserting a new service
-     * @postcondition:  If the list is empty, then a new list is created and the new service becomes the first item on
-     *                  the list.  If the list is not empty, the new service is added at the end of a list
-     *
-     * @param toAdd: An object containing service information
-     * @return true:  Inserting new service is successful
-     * @return false: Inserting new service is failed, toAdd may be null
-     */
-    public boolean addService(Service toAdd)
-    {
-        if (toAdd != null) {
-            // if services is null, create a new list of services
-            if (services == null) {
-                services = new HashSet<Service>();
-            }
-            services.add(toAdd);  // insert toAdd to list
-            ++ consult; // increment consultation with a member
-            return true;
-        }
-        // if toAdd object is null return false
-        return false;
-    }
-
-
-    /** Returns the first name of a provider.  Use this method to write provider's name in member reports
-     * @return  the firstName field of this class
-     */
-    public String getFirstName()
-    {
-        return this.firstName;
-    }
-
-
-     /** Returns the last name of a provider.  Use this method to write provider's name in member reports
-      * @return  the lastName field of this class
-     */
-    public String getLastName() { return this.lastName; }
-
-
-
-    /**  Compares the parameter with the service code stored in the service class
-     * @precondition:
-     *              Case 1: List is empty
-     *              Case 2: List is not empty, service code not found
-     *              Case 3: List is not empty, service code found
-     * @postcondition:
-     *              This method does not search for service code if the list is empty
-     *              This method returns true if the service code in Service class matches the parameter.
-     *              This method searches all items in the list until it finds a match or reaches the end of the list
-     * @param serviceCode: integer value
-     * @return  true: Service class's service code matches the parameter
-     * @return  false: If the list is not empty, then there are no matching service code. Otherwise the list is empty
-     */
-    public boolean checkServiceCode(int serviceCode)
-    {
-        boolean aMatch = false;
-
-        for (Service s: services) {
-   //         aMatch = s.compareCode(serviceCode); // NEED A METHOD IN SERVICE CLASS THAT COMPARES SERVICE CODE AND
-                                                // RETURNS TRUE IF IT MATCHES
-            if (aMatch == true) {
-                return aMatch;
-            }
-        }
-        return aMatch;
-    }
-
+    // Returns provider's info as a string.  Able to display on screen or write to a file
     public String toString()
     {
-        boolean debug = !true;
+        String person;
+        String location;
 
-        if(debug == true)
-        {
-            System.out.println("Provider toString");
-        }
-
-//        String data = null;
-
-        String data = super.toString();
-
-        return data;
+        person = "Provider Name: " + this.firstName + " " + this.lastName + "\nProvider number: " + this.id;
+        location = "Provider street address: " + this.address + "\nProvider city: " + this.city + "\nProvider state: " + this.state
+                    + "\nProvider zip code: " + this.zip;
+        return person + "\n" + location;
     }
 
-    // Displays the provider's information and all the services the provider provided
-    public void displayAll()
+
+
+    // Returns provider's service totals and consultations as a string.
+    public String serviceTotal()
     {
-        // display provider
-        System.out.println(this);
-        // display all services
-        for(Service s: services)
+        String providerService = "Number of consultations with member: " + this.consult + "\n"
+                + "Total fee to be paid: " + this.totalFees;
+
+        return providerService;
+    }
+
+
+
+    // Displays the provider's information, the member's that received service, and all the services the provider provided
+    public void displayAll() {
+        System.out.println(finalReport());
+    }
+
+
+
+    /**  Checks if the list of services is empty
+     *
+     * @return true:  services is null, and the list is empty
+     * @return false: There's at least one item in the list of services
+     */
+    private boolean isEmpty() { return (services == null); }
+
+
+
+    /** Returns the provider report to a string in the following format:
+     *          Provider name:
+     *          Provider number:
+     *          Provider street address:
+     *          Provider city:
+     *          Provider state:
+     *          Provider zip code:
+     *
+     *          --- Services provided ---
+     *          Date of service:
+     *          Current data and time:
+     *          Member name:
+     *          Service code:
+     *          Fee to be paid:
+     *
+     * @return reportFormat:  The provider report stored in a string object
+     */
+    public String finalReport()
+    {
+        StringBuilder reportFormat = new StringBuilder();
+        String [] records;
+        int size;
+
+        records = serviceReport();
+        // append provider's info
+        reportFormat.append(toString() + "\n\n" + "--- Service provided ---\n");
+        // if services is not null, append all services
+        if (records != null)
         {
-            System.out.println(s);
+            size = records.length;
+            for (int i = 0; i < size; ++i)
+            {
+                reportFormat.append(records[i] + "\n");
+            }
         }
+        else
+        {
+            reportFormat.append("No services on record.\n");
+        }
+        // append fee total and number of consultants
+        reportFormat.append(serviceTotal() + "\n\n");
+        return reportFormat.toString();
+    }
+
+
+
+    /**  Format member and service data to the provider report.
+     * Format Example:
+     *          Date of service:
+     *          Current data and time:
+     *          Member name:
+     *          Service code:
+     *          Fee to be paid:
+     * @precondition: if the provider does not provide any services, this method will return a null string
+     * @postcondition: creates the service portion of the provider report if the list of services in not empty
+     * @return servReport: An array of string objects
+     */
+    private String[] serviceReport()
+    {
+        int arraySize;
+        int count = 0; // keep track of the number of services and members in a list
+        int serviceCategories = 4; // The number of fields in services that will be in the report
+        String [] servReport = null;
+
+      if (!isEmpty())
+       {
+            arraySize = (services.size() * serviceCategories) + memberNames.size() + memberId.size();
+            servReport = new String[arraySize];
+            // load all service and member information that belongs to a provider report
+            for (int i = 0; i < arraySize; ++i)
+            {
+                // date of service need update: call services.get(count).dateOfService();
+                servReport[i++] = "Date of service: " + (services.get(count).dateOfService());
+                // Need to change to: services.get(count).dataTime()
+                servReport[i++] = "Current date and time: " + (services.get(count).dateTime());
+                servReport[i++] = "Member name: " + memberNames.get(count);
+                servReport[i++] = "Member number: " + memberId.get(count);
+                servReport[i++] = "Service code: " + Integer.toString(services.get(count).serviceCode);
+                servReport[i] = "Fee to be paid: " + services.get(count).fee + "\n";
+                ++count;  // move to the next service and member
+            }
+        }
+        return servReport;
     }
 }

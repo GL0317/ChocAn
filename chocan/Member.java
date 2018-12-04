@@ -1,91 +1,139 @@
 package chocan;
 import java.util.*;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
 
 public class Member extends Data
 {
+    private ArrayList<String> providers; //Holds Providers of services
+    private PrintWriter toFile;
+    protected Boolean current;
+
     public Member()
     {
         super();
-       // System.out.println("Member default constructor ");
+        current = false;
+        providers = null;
     }
 
-
-    /**
-     *
-     * @param fName
-     * @param lName
-     * @param address
-     * @param city
-     * @param state
-     * @param zip
-     * @param id
-     */
-    public Member(String fName, String lName, String address, String city, String state, int zip, int id)
+    public Member(String fName, String lName, String address, String city, String state, int id, int zip, boolean current)
     {
         super(fName, lName, address, city, state, zip, id);
+        providers = null;
+        this.current = current;
     }
 
-
-    /** Writes member's information, services attended, and the name of providers of each service to a file
-     *
-     * @precondition:  If a file does not exist, this method creates a new file and writes to the file.
-     * @postcondition:  A new file exist or a new member's info is appended to an existing file
-     */
-    /*public void buildReport(String fileName)
+    public int getID()
     {
-
-    }*/
-  /*  public boolean buildReport(String fileName, boolean append) {
-        return false;
-    }*/
-
-
-    /**  Adds one service to a list of services that a member receives
-     *
-     * @param aService
-     * @precondition:   if the list of services is empty, the new service to add should be the first item on the
-     *                  list, otherwise new services are appended to the list
-     * @postcondition:  One more item is appended to a list of services
-     * @return true: new service successfully appended to the list of services
-     * @return false: new service did not append to the list
-     */
-    public boolean addService(Service aService, String name, int id)
-    {
-        return false;
+        return this.id;
     }
 
-
-
-    /** Displays a member's information
-     * @precondition:
-     * @postcondition:
-     */
- /*   public void displayPerson()
+    public boolean addService(Service aService, String prov_name, int id)
     {
-        DONT NEED THIS, CAN DELETE
-    }*
-
-
-    /** Display's a member's information and all services provided to the member
-     * @precondition:
-     * @postcondition:
-     */
-    public void displayAll()
-    {
-
-    }
-
-    public String[] report()
-    {
-/*        boolean debug = true;
-        if(debug == true)
-        {
-            System.out.println("Data report");
+        if (aService != null) {  //Check if aService is null
+            if (services == null) { //Check if services list exists
+                services = new ArrayList<>();
+            }
+            if (providers == null) { //Check if providers exists
+                providers = new ArrayList<>();
+            }
+            services.add(aService); //Adding service
+            providers.add(prov_name); //Adding provider name
+            return true;
         }
-*/
+        return false; //Error
+    }
+
+    public void displayPerson()
+    {
+        System.out.println(this);
+    }
+
+    public void displayAll() {
+        System.out.println(this);
+        if (services != null) {
+            System.out.println("Services:\n\n");
+            for (int i = 0; i < services.size(); i++) {
+                System.out.println("Provider: " + providers.get(i) + "\n");
+                System.out.println(services.get(i));
+            }
+        } else {
+            System.out.println("No services on record\n");
+        }
+    }
+
+    public boolean buildReport(String fileName)
+    {
+        boolean isOpen = true;
+
+        try
+        {
+            toFile = new PrintWriter(fileName);
+        }
+        catch (FileNotFoundException e)
+        {
+            isOpen = false;
+        }
+        if (isOpen)
+        {
+            toFile.println(finalReport());  // write the provider report to file
+            toFile.close();
+        }
+        return isOpen;
+    }
+
+    public String finalReport()
+    {
+        StringBuilder reportFormat = new StringBuilder();
+        String [] records;
+        int size;
+
+        records = serviceReport();
+        reportFormat.append(toString() + "--- Service provided ---\n");
+
+        if (records != null)
+        {
+            size = records.length;
+            for (int i = 0; i < size; ++i)
+            {
+                reportFormat.append(records[i] + "\n");
+            }
+        }
+        else
+        {
+            reportFormat.append("No services on record.\n\n");
+        }
+        return reportFormat.toString();
+    }
+
+    private String[] serviceReport()
+    {
+        int arraySize;
+        int count = 0; // keep track of the number of services and members in a list
+        int serviceCategories = 2; // The number of fields in services that will be in the report
+        String [] servReport = null;
+
+      if (services != null)
+       {
+            arraySize = (services.size() * serviceCategories) + providers.size();
+            servReport = new String[arraySize];
+            // load all service and member information that belongs to a provider report
+            for (int i = 0; i < arraySize; ++i)
+            {
+                servReport[i++] = "Date of service: " + (services.get(count).dateOfService());
+                servReport[i++] = "Provider name: " + providers.get(count);
+                servReport[i] = "Service code: " + Integer.toString(services.get(count).serviceCode);
+                ++count;  // move to the next service and member
+            }
+        }
+        return servReport;
+    }
+
+    public String[] strArray()
+    {
         String[] data = new String[8];
 
-//        String data = null;
         data[0] = this.lastName;
         data[1] = this.firstName;
         data[2] = Integer.toString(this.id);
@@ -93,8 +141,17 @@ public class Member extends Data
         data[4] = this.city;
         data[5] = this.state;
         data[6] = Integer.toString(this.zip);
-
+        data[7] = Boolean.toString(this.current);
         return data;
     }
+    public String toString()
+    {
+        String person;
+        String location;
 
+        person = "Member Name: " + this.firstName + " " + this.lastName + "\nMember number: " + this.id;
+        location = "Member street address: " + this.address + "\nMember city: " + this.city + "\nMember state: " + this.state
+                    + "\nMember zip code: " + this.zip;
+        return person + "\n" + location + "\n\n";
+    }
 }

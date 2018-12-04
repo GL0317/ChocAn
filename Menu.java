@@ -1,16 +1,15 @@
-import java.awt.*;
 import java.util.*;
 import chocan.*;
 
 public class Menu
 {
-//    protected Scanner input;
     protected static Scanner input;
 
     public static void main(String[] args)
     {
         System.out.println("Welcome to ChocAn Data Processing System");
-/*        input = new Scanner(System.in);
+
+        input = new Scanner(System.in);
         int PID = 0;
 
         //class objects
@@ -42,8 +41,11 @@ public class Menu
             if (1 == choice)
             {
                 boolean mgrAuth = PDir.verifyPrivilege(PID);
-                if (!mgrAuth)
+
+                if (!mgrAuth) {
                     System.out.print("***You are not authorized to view the Management Menu***\n");
+                    System.out.println("EXITING\n");
+                }
                 else
                 {
                     System.out.print("***Authorized***\n");
@@ -70,12 +72,13 @@ public class Menu
                                     int zip = 0;
                                     boolean status = false;
 
-                                    getInfo(mgrChoice, lastName, firstName, id, address, city, state, zip, status);
-                                    Member nMember = new Member(lastName, firstName, id, address, city, state, zip, status);
+                                    String[] tData = getInfo(mgrChoice);
+                                    Member nMember = new Member(tData[1], tData[0], tData[3], tData[4], tData[5], Integer.parseInt(tData[6]), Integer.parseInt(tData[2]), Boolean.parseBoolean(tData[7]));
+//                                    getInfo(mgrChoice, lastName, firstName, id, address, city, state, zip, status);
+//                                    Member nMember = new Member(firstName, lastName, address, city, state, zip, id, status);
 
                                     int added = MDir.addMember(nMember);
-//                                    int added = MDir.add(nMember);
-                                    if (1 == added)
+                                    if (0 == added)
                                         System.out.print("\n***Member added***\n");
                                     else
                                         System.out.print("\n***Error adding member***\n");
@@ -89,7 +92,6 @@ public class Menu
                                     input.nextLine();
 
                                     boolean found = MDir.verifyMember(MID);
-//                                    boolean found = MDir.findMember(MID);
 
                                     if (!found)
                                         System.out.print("\n***Error: member not found***\n");
@@ -112,7 +114,6 @@ public class Menu
                                     input.nextLine();
 
                                     boolean found = MDir.verifyMember(MID);
-//                                    boolean found = MDir.findMember(MID);
 
                                     if (!found)
                                         System.out.print("\n***Error: member not found***\n");
@@ -131,7 +132,6 @@ public class Menu
                                 //if user chooses to display all members
                                 else if (4 == mbrMgmtChoice)
                                     System.out.println(MDir);
-//                                    MDir.displayAll();
 
                                 mbrMgmtChoice = mbrMgmtMenu();
                             }
@@ -157,11 +157,11 @@ public class Menu
                                     int zip = 0;
                                     boolean status = false;
 
-                                    getInfo(mgrChoice, lastName, firstName, id, address, city, state, zip, status);
-                                    Provider nProvider = new Provider(lastName, firstName, id, address, city, state, zip, status);
+                                    String[] tData = getInfo(mgrChoice);
+                                    Provider nProvider = new Provider(tData[0], tData[1], tData[3], tData[4], tData[5], Integer.parseInt(tData[6]), Integer.parseInt(tData[2]), Boolean.parseBoolean(tData[7]));
 
                                     int added = PDir.addProvider(nProvider);
-                                    if (1 == added)
+                                    if (0 == added)
                                         System.out.print("\n***Provider added***\n");
                                     else
                                         System.out.print("\n***Error adding provider***\n");
@@ -181,7 +181,7 @@ public class Menu
                                     else
                                     {
                                         int deleted = PDir.removeProvider(pid);
-                                        if (1 == deleted)
+                                        if (0 == deleted)
                                             System.out.print("\n***Provider deleted***\n");
                                         else
                                             System.out.print("\n***Error deleting provider***\n");
@@ -215,7 +215,6 @@ public class Menu
                                 //if user chooses to display all providers
                                 else if (4 == pvdrMgmtChoice)
                                     System.out.println(PDir);
-//                                    PDir.displayAll();
 
                                 pvdrMgmtChoice = pvdrMgmtMenu();
                             }
@@ -230,18 +229,12 @@ public class Menu
                             {
                                 //if user chooses to display service codes
                                 if (1 == svcChoice)
-                                    System.out.println(svc);
-                                    //System.out.println(SDir);  // Print each entry in SDirectory?
-//                                    svc.displayAll();
+                                    //System.out.println(svc);
+                                    System.out.println(SDir);  // Print each entry in SDirectory?
                                     //if user chooses to create service record
                                 else if (2 == svcChoice)
                                 {
-                                    boolean added = newSvcRec(MDir, PDir, svc, PID, SDir);  //utility function
-
-                                    if (added)
-                                        System.out.print("\n***Service record created***");
-                                    else
-                                        System.out.print("\n***Error creating service record");
+                                    newSvcRec(MDir, PDir, svc, PID, SDir);  //utility function
                                 }
                                 svcChoice = svcMenu();
                             }
@@ -255,18 +248,21 @@ public class Menu
                             while (4 != mgrReportsChoice)
                             {
                                 //if user chooses to create member report
-                                if (1 == mgrReportsChoice)
+                                if (1 == mgrReportsChoice) {
                                     MDir.buildReports();
+                                }
 
-                                    //if user chooses to create provider report
-                                else if (2 == mgrReportsChoice)
+                                //if user chooses to create provider report
+                                else if (2 == mgrReportsChoice) {
                                     PDir.buildReports();
+                                    //System.out.println("THIS IS WHERE PROVIDER REPORTS WILL PRINT\n");
+                                }
 
-                                    //if user chooses to create manager report
-                                else if (3 == mgrReportsChoice)
-                                    //create manager report
-
-                                    mgrReportsChoice = mgrReportsMenu();
+                                //if user chooses to create manager report
+                                else if (3 == mgrReportsChoice) {
+                                    System.out.println("NEED TO IMPLEMENT\n");
+                                }
+                                mgrReportsChoice = mgrReportsMenu();
                             }
                             mgrChoice = mgrMainMenu();
                         }
@@ -281,8 +277,10 @@ public class Menu
                 boolean pvdrAuth = true;
                 int pvdrChoice = 0;
 
-                if (!pvdrAuth)
+                if (!pvdrAuth) {
                     System.out.print("\n***You are not authorized to view the Provider Menu***\n");
+                    System.out.println("EXITING");
+                }
                 else
                 {
                     System.out.print("***Authorized***\n");
@@ -310,12 +308,12 @@ public class Menu
                                 int zip = 0;
                                 boolean status = false;
 
-                                getInfo(pvdrChoice, lastName, firstName, id, address, city, state, zip, status);
-                                Member nMember = new Member(lastName, firstName, id, address, city, state, zip, status);
+                                String[] tData = getInfo(pvdrChoice);
+                                Member nMember = new Member(tData[1], tData[0], tData[3], tData[4], tData[5], Integer.parseInt(tData[6]), Integer.parseInt(tData[2]), Boolean.parseBoolean(tData[7]));
 
                                 int added = MDir.addMember(nMember);
-//                                int added = MDir.add(nMember);
-                                if (1 == added)
+
+                                if (0 == added)
                                     System.out.print("\n***Member added***\n");
                                 else
                                     System.out.print("\n***Error adding member***\n");
@@ -329,14 +327,13 @@ public class Menu
                                 input.nextLine();
 
                                 boolean found = MDir.verifyMember(MID);
-//                                boolean found = MDir.findMember(MID);
 
                                 if (!found)
                                     System.out.print("\n***Error: member not found***\n");
                                 else
                                 {
                                     int deleted = MDir.removeMember(MID);
-                                    if (1 == deleted)
+                                    if (0 == deleted)
                                         System.out.print("\n***Member deleted***\n");
                                     else
                                         System.out.print("\n***Error deleting member***\n");
@@ -352,7 +349,6 @@ public class Menu
                                 input.nextLine();
 
                                 boolean found = MDir.verifyMember(mid);
-//                                boolean found = MDir.findMember(mid);
 
                                 if (!found)
                                     System.out.print("\n***Error: member not found***\n");
@@ -371,7 +367,6 @@ public class Menu
                             //if user chooses to display all members
                             else if (4 == mbrMgmtChoice)
                                 System.out.println(MDir);
-//                                MDir.displayAll();
 
                             mbrMgmtChoice = mbrMgmtMenu();
                         }
@@ -388,17 +383,11 @@ public class Menu
                             if (1 == svcChoice)
                             {
                                   System.out.println(SDir);
-//                                svc.displayAll();
                             }
-                                //if user chooses to create service record
+                            //if user chooses to create service record
                             else if (2 == svcChoice)
                             {
-                                boolean added = newSvcRec(MDir, PDir, svc, PID, SDir);
-
-                                if (added)
-                                    System.out.print("\n***Service record created***");
-                                else
-                                    System.out.print("\n***Error creating service record");
+                                newSvcRec(MDir, PDir, svc, PID, SDir);
                             }
                             svcChoice = svcMenu();
                         }
@@ -413,6 +402,7 @@ public class Menu
                         {
                             //if user chooses to create member report
                             if (1 == pvdrReportsChoice)
+                                //System.out.println("");
                                 MDir.buildReports();
 
                                 //if user chooses to create provider report
@@ -674,7 +664,8 @@ public class Menu
         return menuOption;
     }
 
-    public static void getInfo(int choice, String lastName, String firstName, int id, String address, String city, String state, int zip, boolean status) {
+    public static String[] getInfo(int choice) {
+//        public static void getInfo(int choice, String lastName, String firstName, int id, String address, String city, String state, int zip, boolean status) {
         if (1 == choice)
             System.out.print("\n***Add new member***\n");
         else if (2 == choice)
@@ -682,30 +673,30 @@ public class Menu
         else
             System.out.print("\n***Invalid entry***\n");
 
+        String[] data = new String[8];
+
         System.out.print("\nPlease enter the following information:\n");
 
         System.out.print("\nLast name: ");
-        lastName = input.nextLine();
+        data[0] = input.nextLine();
 
         System.out.print("\nFirst name: ");
-        firstName = input.nextLine();
+        data[1] = input.nextLine();
 
         System.out.print("\n9-digit ID: ");
-        id = input.nextInt();
-        input.nextLine();
+        data[2] = input.nextLine();
 
         System.out.print("\nStreet address: ");
-        address = input.nextLine();
+        data[3] = input.nextLine();
 
         System.out.print("\nCity: ");
-        city = input.nextLine();
+        data[4] = input.nextLine();
 
         System.out.print("\nState: ");
-        state = input.nextLine();
+        data[5] = input.nextLine();
 
         System.out.print("\nZip code: ");
-        zip = input.nextInt();
-        input.nextLine();
+        data[6] = input.nextLine();
 
         if (1 == choice)
         {
@@ -720,9 +711,9 @@ public class Menu
             }
 
             if (('Y' == current) || ('y' == current))
-                status = true;
+                data[7] = "true";
             else
-                status = false;
+                data[7] = "false";
         }
         else if (2 == choice)
         {
@@ -737,17 +728,19 @@ public class Menu
             }
 
             if (('Y' == mgr) || ('y' == mgr))
-                status = true;
+                data[7] = "true";
             else
-                status = false;
+                data[7] = "false";
         }
+
+        return data;
     }
 
-    public static boolean newSvcRec(MDirectory MDir, PDirectory PDir, Service svc, int PID, SDirectory SDir)
+    public static void newSvcRec(MDirectory MDir, PDirectory PDir, Service svc, int PID, SDirectory SDir)
     {
         System.out.print("\nPlease enter the 9-digit Member ID: ");
         int MID = input.nextInt();
-        input.nextLine();
+//        input.nextLine();
 
         boolean valid = MDir.verifyMember(MID);  //should we make this an int so we can print "invalid, suspended, validated?"
         if (valid)
@@ -778,14 +771,14 @@ public class Menu
                 svcCode = input.nextInt();
                 input.nextLine();
 
-                boolean found = svc.find(svcCode);
+                boolean found = SDir.verifyService(svcCode);
                 while (!found)
                 {
                     System.out.print("\n***Invalid service code***");
                     System.out.print("\nPlease enter the 6-digit service code: ");
                     svcCode = input.nextInt();
                     input.nextLine();
-                    found = svc.find(svcCode);
+                    found = SDir.verifyService(svcCode);
                 }
 
                 System.out.print("\nYou entered " + svcCode + ".  Is this correct? (Y/N): ");
@@ -803,11 +796,18 @@ public class Menu
             System.out.print("\nPlease add comments regarding the service provided: ");
             String comments = new String();
             comments = input.nextLine();
+            comments = input.nextLine(); // Temp fix for comments
 
-            boolean addSvc = svc.createServiceRec(month, day, year, svcCode, comments, MID, PID);
-            return addSvc;
+            int nFee = SDir.getFee(svcCode);
+
+            Service nService = new Service(month, day, year, svcCode, nFee, comments);
+
+            Provider tProvider = PDir.findProvider(PID);
+            Member tMember = MDir.findMember(MID);
+
+            tMember.addService(nService, tProvider.getName(), 0);
+            tProvider.addService(nService, tMember.getName(), tMember.getID());
         }
-        return false;
     }
 
     public static boolean editMbr(int editOption, int choice, int id, MDirectory mDir)
@@ -896,6 +896,5 @@ public class Menu
         boolean edited = pDir.editProvider(id, st, num, status, editOption);
 
         return edited;
-*/
     }
 }

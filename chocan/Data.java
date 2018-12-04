@@ -1,11 +1,9 @@
 package chocan;
 import java.util.*;
 
-//public class Data
 public abstract class Data
 {
     protected ArrayList<Service> services;
-
 
     protected String firstName;
     protected String lastName;
@@ -14,8 +12,6 @@ public abstract class Data
     protected String state;
     protected int zip;
     protected int id;
-
-
 
     public Data()
     {
@@ -29,13 +25,11 @@ public abstract class Data
         id = 0;
     }
 
-
-
-    public Data(String fName, String lName, String address, String city, String state, int zip, int id)
+    public Data(String lName, String fName, String address, String city, String state, int zip, int id)
     {
         services = null;
-        this.firstName = fName;
         this.lastName = lName;
+        this.firstName = fName;
         this.address = address;
         this.city = city;
         this.state = state;
@@ -43,34 +37,6 @@ public abstract class Data
         this.id = id;
     }
 
-
-
-    // Outputs attributes to a screen or a file, depending on output stream
-    public String toString()
-    {
-        boolean debug = !true;
-        String person;
-        String location;
-
-        if(debug == true)
-        {
-            System.out.println("Data toString");
-        }
-        person = "First Name: " + this.firstName + "\nLast Name: " + this.lastName + "\nID Number: " + this.id;
-        location = "Address: " + this.address + "\nCity: " + this.city + "\nState: " + this.state + "\nZip: " + this.zip;
-        return person + "\n" + location;
-
-    }
-
-
-
-    /** Edits provider or member's information
-     *
-     * @param info - all string type data: first name, last name, address, city, and state
-     * @param number - all integer type data:  id and zip code
-     * @param choice - selects the data to edit
-     * @return
-     */
     public boolean edit (String info, int number, int choice)
     {
         boolean flag = true;
@@ -79,19 +45,19 @@ public abstract class Data
             switch (choice)
             {
                 case 1:
-                    lastName = new String(info);
+                    lastName = info;
                     break;
                 case 2:
-                    firstName = new String(info);
+                    firstName = info;
                     break;
                 case 4:
-                    address = new String(info);
+                    address = info;
                     break;
                 case 5:
-                    city = new String(info);
+                    city = info;
                     break;
                 case 6:
-                    state = new String(info);
+                    state = info;
                     break;
                 default:
                     flag = false;
@@ -115,17 +81,32 @@ public abstract class Data
        return flag;
     }
 
+    public String getName()
+    {
+        StringBuilder data = new StringBuilder();
 
+        data.append(firstName+ " " + lastName);
 
-    //  Allow subclasses to write and append their data to a file
-    public abstract String[] report();
+        return  data.toString();
 
+    }
+    // Outputs attributes to a screen or a file, depending on output stream
+    public String toString()
+    {
+        String person;
+        String location;
 
+        person = "First Name: " + this.firstName + "\nLast Name: " + this.lastName + "\nID Number: " + this.id;
+        location = "Address: " + this.address + "\nCity: " + this.city + "\nState: " + this.state + "\nZip: " + this.zip;
+        return person + "\n" + location;
+
+    }
+
+    //Return an array of strings representation of the data, used for saveFile
+    public abstract String[] strArray();
 
     // Allow subclasses to add services to their own list of services
     public abstract boolean addService(Service aService, String name, int id);
-
-
 
     // Allow subclasses to output their data, and all of their services
     public abstract void displayAll();
